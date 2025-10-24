@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Habit Tracker — Интерактивный планировщик привычек</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+<body class="light">
+  <div class="app-grid">
+    <header class="topbar">
+      <div class="brand">Habit<span>Tracker</span></div>
+      <div class="top-actions">
+        <button id="themeToggle" class="icon-btn" title="Тема">🌓</button>
+        <button id="exportBtn" class="btn">Экспорт PNG</button>
+      </div>
+    </header>
+
+    <!-- Left: habits list -->
+    <aside class="sidebar">
+      <div class="sidebar-head">
+        <h3>Привычки</h3>
+        <button id="addHabitBtn" class="btn">+ Добавить</button>
+      </div>
+      <ul id="habitsList" class="habits-list">
+        <!-- habits inserted here -->
+      </ul>
+      <div class="legend">
+        <small>Подсказка: выберите привычку, чтобы видеть её календарь и статистику.</small>
+      </div>
+    </aside>
+
+    <!-- Main: calendar -->
+    <main class="main-area">
+      <div class="calendar-header">
+        <div class="month-nav">
+          <button id="prevMonth" class="icon-btn">◀</button>
+          <div id="currentMonth" class="month-title">Месяц 2025</div>
+          <button id="nextMonth" class="icon-btn">▶</button>
+        </div>
+        <div class="selected-habit-info" id="selectedHabitInfo">
+          <!-- habit name + icon -->
+        </div>
+        <div class="view-toggle">
+          <button id="toggleViewMode" class="btn ghost">Показать все привычки</button>
+        </div>
+      </div>
+
+      <div id="calendar" class="calendar-grid">
+        <!-- calendar days -->
+      </div>
+    </main>
+
+    <!-- Right: stats -->
+    <aside class="rightbar">
+      <div id="statsCard" class="card stats-card">
+        <h4>Статистика</h4>
+        
+        <!-- Новые табы для переключения периода -->
+        <div class="stats-period-toggle">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-period="week">Неделя</button>
+            <button class="tab-btn" data-period="month">Месяц</button>
+          </div>
+        </div>
+
+        <div class="progress-wrap">
+          <svg id="progressSvg" viewBox="0 0 36 36" class="circular-chart">
+            <path class="circle-bg"
+              d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path id="progressCircle" class="circle"
+              stroke-dasharray="0,100"
+              d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <text id="progressText" x="18" y="20.35" class="percentage">0%</text>
+          </svg>
+        </div>
+
+        <div class="stats-list">
+          <div>Процент выполнения: <strong id="weekPercent">0%</strong></div>
+          <div>Выполнено дней: <strong id="totalChecks">0/0</strong></div>
+          <div>Режим просмотра: <strong id="viewModeText">—</strong></div>
+        </div>
+
+        <div class="card-actions">
+          <button id="deleteHabitBtn" class="btn danger">Удалить привычку</button>
+        </div>
+      </div>
+
+      <div class="card tips">
+        <h4>Советы</h4>
+        <ul>
+          <li>Добавьте привычку, выберите иконку и цвет.</li>
+          <li>Кликайте по дню в календаре, чтобы отмечать выполнение.</li>
+          <li>Используйте кнопку "Показать все привычки" для общего обзора.</li>
+          <li>Статистика обновляется автоматически и хранится локально.</li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Modal: Add Habit -->
+  <div id="addHabitModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Новая привычка</h3>
+      <label>Название
+        <input id="habitTitle" type="text" placeholder="Например: пить воду"/>
+      </label>
+      <label>Цвет
+        <input id="habitColor" type="color" value="#4caf50"/>
+      </label>
+      <div>
+        <div>Иконка</div>
+        <div id="iconChoices" class="icon-choices">
+          <!-- icon options inserted here -->
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="saveHabitBtn" class="btn">Сохранить</button>
+        <button id="cancelHabitBtn" class="btn ghost">Отмена</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

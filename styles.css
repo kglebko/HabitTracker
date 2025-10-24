@@ -1,0 +1,1134 @@
+:root {
+  --bg: #FAFBFD;
+  --surface: #FFFFFF;
+  --text: #0F1724;
+  --muted: #6B7280;
+  --accent: #00BCD4;
+  --primary: #4CAF50;
+  --danger: #EF4444;
+  --border: rgba(0,0,0,0.08);
+  --radius: 10px;
+  --card-shadow: 0 6px 18px rgba(19,24,32,0.06);
+  --hover-shadow: 0 8px 25px rgba(19,24,32,0.1);
+}
+
+body.dark {
+  --bg: #071126;
+  --surface: #0B1320;
+  --text: #E6EEF3;
+  --muted: #9AA6B2;
+  --border: rgba(255,255,255,0.08);
+  --card-shadow: 0 6px 18px rgba(2,6,23,0.6);
+  --hover-shadow: 0 8px 25px rgba(2,6,23,0.8);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  padding: 12px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Layout */
+.app-grid {
+  display: grid;
+  grid-template-columns: 260px 1fr 300px;
+  grid-template-rows: 64px 1fr;
+  gap: 16px;
+  height: calc(100vh - 24px);
+}
+
+/* Topbar */
+.topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(10px);
+}
+
+.brand {
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.5px;
+}
+
+.brand span {
+  color: var(--accent);
+}
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Buttons */
+.btn {
+  background: var(--primary);
+  border: none;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--hover-shadow);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn.ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+
+.btn.ghost:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+.btn.danger {
+  background: var(--danger);
+}
+
+.btn.danger:hover {
+  background: #dc2626;
+}
+
+.icon-btn {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+}
+
+.icon-btn:hover {
+  background: rgba(0,0,0,0.03);
+  border-color: var(--muted);
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.sidebar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sidebar-head h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Habits List */
+.habits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.habit-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
+}
+
+.habit-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--hover-shadow);
+  border-color: var(--border);
+}
+
+.habit-item.selected {
+  background: rgba(0,188,212,0.05);
+  border-color: var(--accent);
+  box-shadow: var(--card-shadow);
+}
+
+.habit-item.dimmed {
+  opacity: 0.6;
+}
+
+.habit-item.dimmed:hover {
+  opacity: 0.8;
+}
+
+.habit-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.habit-item:hover .habit-icon {
+  transform: scale(1.05);
+}
+
+.habit-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.habit-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.habit-meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+
+.legend {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.legend small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Main Area */
+.main-area {
+  background: var(--surface);
+  padding: 20px;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.month-nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.month-title {
+  font-weight: 600;
+  font-size: 18px;
+  min-width: 180px;
+  text-align: center;
+}
+
+.selected-habit-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.btn.active {
+  background: var(--accent);
+  color: white;
+}
+
+.btn.active:hover {
+  background: var(--accent);
+  color: white;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  animation: fadeIn 0.4s ease;
+  flex: 1;
+}
+
+.weekday {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  padding: 8px 4px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.day {
+  min-height: 90px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), transparent);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 6px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.day:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--hover-shadow);
+  border-color: var(--accent);
+}
+
+.day.empty {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.day.today {
+  border: 2px solid var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,188,212,0.1);
+  background: linear-gradient(135deg, rgba(0,188,212,0.05), transparent);
+}
+
+.day.marked {
+  background: linear-gradient(135deg, rgba(76,175,80,0.08), transparent);
+  border-color: rgba(76,175,80,0.3);
+}
+
+.day.multi-marked {
+  background: linear-gradient(135deg, rgba(255,255,255,0.05), transparent);
+  border: 1.5px solid var(--border);
+}
+
+.day-num {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* Dots for multiple habits */
+.dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  justify-content: center;
+  margin-top: 4px;
+  max-width: 100%;
+}
+
+.habit-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.habit-dot:hover {
+  transform: scale(1.3);
+}
+
+.dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin: 0 auto;
+  transition: all 0.2s ease;
+}
+
+.extra-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--accent);
+  color: white;
+  border-radius: 8px;
+  padding: 2px 6px;
+  font-size: 9px;
+  line-height: 1;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Rightbar */
+.rightbar {
+  background: var(--surface);
+  padding: 16px;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.card {
+  background: transparent;
+  padding: 0;
+}
+
+.stats-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  text-align: center;
+}
+
+.stats-card h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+/* Progress Circle */
+.progress-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.circular-chart {
+  width: 100%;
+  height: 100%;
+}
+
+.circle-bg {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2.8;
+}
+
+.circle {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: stroke-dasharray 0.6s ease, stroke 0.4s ease;
+}
+
+.percentage {
+  font-size: 0.5em;
+  text-anchor: middle;
+  fill: var(--text);
+  font-weight: 600;
+}
+
+/* Stats List */
+.stats-list {
+  text-align: center;
+  width: 100%;
+}
+
+.stats-list div {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.stats-list strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Стили для будущих дат */
+.day.future {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.day.future:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--border);
+}
+
+.day.future .day-num {
+  color: var(--muted);
+}
+
+/* Стили для переключения периода статистики */
+/* Стили для переключения периода статистики в виде табов */
+.stats-period-toggle {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 16px;
+}
+
+.tab-buttons {
+  display: flex;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.tab-btn {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  min-width: 70px;
+  text-align: center;
+}
+
+.tab-btn.active {
+  color: var(--text);
+  background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.tab-btn:hover:not(.active) {
+  color: var(--text);
+  background: rgba(0,0,0,0.03);
+}
+
+/* Анимация для активного таба */
+.tab-btn.active {
+  animation: tabActive 0.3s ease;
+}
+
+@keyframes tabActive {
+  0% {
+    transform: scale(0.95);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Темная тема для табов */
+body.dark .tab-buttons {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.1);
+}
+
+body.dark .tab-btn.active {
+  background: rgba(255,255,255,0.1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+body.dark .tab-btn:hover:not(.active) {
+  background: rgba(255,255,255,0.05);
+}
+
+.btn.small {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+
+.stats-title {
+  font-size: 14px;
+  color: var(--text);
+}
+
+/* Улучшенные стили для статистики */
+.stats-list {
+  text-align: center;
+  width: 100%;
+}
+
+.stats-list div {
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.stats-list strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Анимация переключения */
+.stats-period-toggle .btn {
+  transition: all 0.3s ease;
+}
+
+.stats-period-toggle .btn:hover {
+  transform: scale(1.05);
+  background: rgba(0,188,212,0.1);
+}
+
+.card-actions {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.card-actions .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Tips Card */
+.tips {
+  background: linear-gradient(135deg, rgba(0,188,212,0.03), transparent);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.tips h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text);
+}
+
+.tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.tips li {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  padding-left: 16px;
+  position: relative;
+  line-height: 1.4;
+}
+
+.tips li:before {
+  content: "•";
+  color: var(--accent);
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}
+
+.tips li:last-child {
+  margin-bottom: 0;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2,6,23,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: var(--surface);
+  padding: 24px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border);
+  animation: popIn 0.35s ease;
+  transform-origin: center;
+}
+
+.modal-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--text);
+}
+
+/* Form Elements */
+.modal-content label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  display: block;
+  margin-bottom: 16px;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="color"] {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.25s ease;
+  margin-top: 6px;
+}
+
+.modal-content input[type="text"]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0,188,212,0.15);
+}
+
+.modal-content input[type="color"] {
+  height: 48px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* Icon Choices */
+/* Исправленные стили для выбора иконок в модальном окне */
+.icon-choices {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 16px 0;
+  justify-items: center;
+  align-items: center;
+}
+
+.icon-choice {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.icon-choice:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+
+.icon-choice.selected {
+  border-color: var(--accent);
+  background: rgba(0,188,212,0.1);
+  box-shadow: 0 0 0 3px rgba(0,188,212,0.2);
+  transform: scale(1.05);
+}
+
+/* Убедимся, что SVG иконки правильно центрируются */
+.icon-choice svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+/* Улучшим отступы в модальном окне */
+.modal-content > div {
+  margin-bottom: 20px;
+}
+
+.modal-content > div:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Заголовок для выбора иконок */
+.modal-content > div > div:first-child {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.icon-choice:hover {
+  border-color: var(--accent);
+  transform: scale(1.05);
+}
+
+.icon-choice.selected {
+  border-color: var(--accent);
+  background: rgba(0,188,212,0.1);
+  box-shadow: 0 0 0 3px rgba(0,188,212,0.2);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions .btn {
+  flex: 1;
+  justify-content: center;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  background: var(--surface);
+  padding: 12px 18px;
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid var(--border);
+  z-index: 1001;
+  max-width: 300px;
+  animation: slideInUp 0.3s ease;
+}
+
+.toast.hidden {
+  display: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.day.marked {
+  animation: pulse 0.3s ease;
+}
+
+.calendar-grid.fade-out {
+  opacity: 0;
+}
+
+.calendar-grid.fade-in {
+  opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .app-grid {
+    grid-template-columns: 240px 1fr 280px;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .app-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto;
+    height: auto;
+    gap: 12px;
+  }
+  
+  .topbar {
+    order: 0;
+  }
+  
+  .sidebar {
+    order: 1;
+    max-height: 300px;
+  }
+  
+  .main-area {
+    order: 2;
+    min-height: 500px;
+  }
+  
+  .rightbar {
+    order: 3;
+  }
+  
+  .calendar-header {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .selected-habit-info {
+    order: -1;
+    width: 100%;
+  }
+  
+  .month-nav {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    padding: 8px;
+  }
+  
+  .app-grid {
+    gap: 8px;
+  }
+  
+  .topbar {
+    padding: 10px 16px;
+  }
+  
+  .brand {
+    font-size: 18px;
+  }
+  
+  .sidebar,
+  .main-area,
+  .rightbar {
+    padding: 12px;
+  }
+  
+  .calendar-grid {
+    gap: 6px;
+  }
+  
+  .day {
+    min-height: 70px;
+    padding: 8px;
+  }
+  
+  .habit-dot {
+    width: 4px;
+    height: 4px;
+  }
+  
+  .dot {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .progress-wrap {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .modal {
+    padding: 16px;
+  }
+  
+  .modal-content {
+    padding: 20px;
+  }
+  
+  .icon-choices {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .top-actions {
+    gap: 6px;
+  }
+  
+  .btn {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  .icon-btn {
+    padding: 6px 8px;
+  }
+  
+  .month-title {
+    font-size: 16px;
+    min-width: 150px;
+  }
+  
+  .day {
+    min-height: 60px;
+    padding: 6px;
+  }
+  
+  .day-num {
+    font-size: 12px;
+  }
+  
+  .stats-list div {
+    font-size: 13px;
+  }
+  
+  .icon-choices {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Scrollbar Styling */
+.habits-list::-webkit-scrollbar,
+.rightbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.habits-list::-webkit-scrollbar-track,
+.rightbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.habits-list::-webkit-scrollbar-thumb,
+.rightbar::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 2px;
+}
+
+.habits-list::-webkit-scrollbar-thumb:hover,
+.rightbar::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Focus States for Accessibility */
+.btn:focus-visible,
+.icon-btn:focus-visible,
+.icon-choice:focus-visible,
+.day:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .day.marked {
+    border-width: 3px;
+  }
+  
+  .habit-dot {
+    border: 1px solid var(--text);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
