@@ -1,4 +1,3 @@
-// --- Конфигурация и константы ---
 const LS_KEY = 'ht_habits_v2';
 const ICONS = {
   water: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 6 8 6 12a6 6 0 1 0 12 0c0-4-6-10-6-10z" fill="currentColor"/></svg>`,
@@ -9,17 +8,16 @@ const ICONS = {
   check: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>`
 };
 
-// --- Глобальное состояние ---
+
 let state = {
   habits: [],
   selectedHabitId: null,
   viewYear: new Date().getFullYear(),
   viewMonth: new Date().getMonth(),
   showAllHabits: false,
-  statsPeriod: 'week' // 'week' или 'month'
+  statsPeriod: 'week'
 };
 
-// --- DOM элементы ---
 const habitsListEl = document.getElementById('habitsList');
 const addHabitBtn = document.getElementById('addHabitBtn');
 const addHabitModal = document.getElementById('addHabitModal');
@@ -44,7 +42,7 @@ const themeToggle = document.getElementById('themeToggle');
 const exportBtn = document.getElementById('exportBtn');
 const toggleViewMode = document.getElementById('toggleViewMode');
 
-// --- Утилиты для работы с датами ---
+
 function formatDate(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -64,7 +62,6 @@ function isFutureDate(date) {
   return date > new Date();
 }
 
-// --- Функции для работы с периодами ---
 function getWeekRange(date = new Date()) {
   const day = date.getDay();
   const monday = new Date(date);
@@ -105,19 +102,17 @@ function getDatesForPeriod(period, date = new Date()) {
   return dates;
 }
 
-// --- Статистика ---
 function getStats(habit = null, period = 'week') {
   const today = new Date();
   const dates = getDatesForPeriod(period, today);
   
   if (habit) {
-    // Статистика для одной привычки
     const completed = dates.filter(date => {
       const dateStr = formatDate(date);
       return habit.checks[dateStr];
     }).length;
     
-    const total = dates.length; // Всегда полное количество дней в периоде
+    const total = dates.length;
     
     return {
       completed,
@@ -126,22 +121,31 @@ function getStats(habit = null, period = 'week') {
       period: period
     };
   } else {
-    // Статистика для всех привычек
+    if (state.habits.length === 0) {
+      return { completed: 0, total: 0, percent: 0, period: period };
+    }
+    
+    let totalPercent = 0;
     let totalCompleted = 0;
-    let totalPossible = dates.length * state.habits.length;
     
     state.habits.forEach(habit => {
-      dates.forEach(date => {
-        if (habit.checks[formatDate(date)]) {
-          totalCompleted++;
-        }
-      });
+      const completed = dates.filter(date => {
+        const dateStr = formatDate(date);
+        return habit.checks[dateStr];
+      }).length;
+      
+      totalCompleted += completed;
+      const percent = dates.length > 0 ? (completed / dates.length) * 100 : 0;
+      totalPercent += percent;
     });
     
+    const averagePercent = Math.round(totalPercent / state.habits.length);
+    const totalPossibleDays = dates.length * state.habits.length;
+    
     return {
-      completed: totalCompleted,
-      total: totalPossible,
-      percent: totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0,
+      completed: totalCompleted, 
+      total: totalPossibleDays,  
+      percent: averagePercent,   
       period: period
     };
   }
@@ -159,7 +163,7 @@ function getHabitStats(habit) {
   };
 }
 
-// --- Работа с localStorage ---
+
 function loadState() {
   try {
     const raw = localStorage.getItem(LS_KEY);
@@ -190,7 +194,6 @@ function saveState() {
   }
 }
 
-// --- Работа с привычками ---
 function createHabit(name, icon, color) {
   return {
     id: 'h_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
@@ -206,7 +209,7 @@ function findHabit(id) {
   return state.habits.find(h => h.id === id); 
 }
 
-// --- Рендер списка привычек ---
+
 function renderHabits() {
   habitsListEl.innerHTML = '';
   
@@ -254,11 +257,10 @@ function renderHabits() {
   });
 }
 
-// --- Рендер календаря ---
+
 function renderCalendar() {
   calendarEl.innerHTML = '';
   
-  // Добавляем заголовки дней недели
   const weekdays = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
   weekdays.forEach(day => {
     const dayEl = document.createElement('div');
@@ -270,18 +272,18 @@ function renderCalendar() {
   const year = state.viewYear;
   const month = state.viewMonth;
   
-  // Обновляем заголовок месяца
+  
   currentMonthEl.textContent = new Date(year, month).toLocaleString('ru-RU', {
     month: 'long',
     year: 'numeric'
   });
 
   const firstOfMonth = new Date(year, month, 1);
-  const startDay = (firstOfMonth.getDay() + 6) % 7; // Пн = 0
+  const startDay = (firstOfMonth.getDay() + 6) % 7; 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Создаем ячейки календаря
-  for (let i = 0; i < 42; i++) { // 6 недель
+  
+  for (let i = 0; i < 42; i++) { 
     const cell = document.createElement('div');
     cell.className = 'day';
     
@@ -301,24 +303,24 @@ function renderCalendar() {
       cell.classList.add('today');
     }
 
-    // Добавляем класс для будущих дат
+    
     if (isFutureDate(currentDate)) {
       cell.classList.add('future');
     }
 
-    // Номер дня
+    
     const dayNumber = document.createElement('div');
     dayNumber.className = 'day-num';
     dayNumber.textContent = dayNum;
     cell.appendChild(dayNumber);
 
-    // Отметки привычек
+    
     if (state.showAllHabits && state.habits.length > 0) {
-      // Режим показа всех привычек - показываем точки для каждой привычки
+      
       const dotsContainer = document.createElement('div');
       dotsContainer.className = 'dots';
       
-      // Ограничиваем количество отображаемых точек до 6
+      
       const habitsToShow = state.habits.slice(0, 6);
       
       habitsToShow.forEach(habit => {
@@ -335,7 +337,7 @@ function renderCalendar() {
         cell.classList.add('multi-marked');
         cell.appendChild(dotsContainer);
         
-        // Показываем количество дополнительных привычек если их больше 6
+        
         if (state.habits.length > 6) {
           const extraCount = state.habits.slice(6).filter(h => h.checks[dateStr]).length;
           if (extraCount > 0) {
@@ -349,7 +351,7 @@ function renderCalendar() {
       }
       
     } else if (state.selectedHabitId) {
-      // Режим одной выбранной привычки
+      
       const habit = findHabit(state.selectedHabitId);
       if (habit && habit.checks[dateStr]) {
         const dot = document.createElement('div');
@@ -360,28 +362,33 @@ function renderCalendar() {
       }
     }
 
-    // Обработчик клика
     cell.addEventListener('click', () => handleDayClick(dateStr, cell, currentDate));
     calendarEl.appendChild(cell);
   }
 }
 
-// --- Обработчик клика по дню ---
+
 function handleDayClick(dateStr, cell, date) {
-  // Проверяем, не будущая ли это дата
+  
   if (isFutureDate(date)) {
-    showToast('Нельзя отмечать будущие даты!', 2000);
+    showToast('Этот день еще не наступил :(', 2000);
     return;
   }
 
   if (state.showAllHabits) {
-    // В режиме всех привычек показываем информацию о том, какие привычки выполнены
+    
     const completedHabits = state.habits.filter(habit => habit.checks[dateStr]);
+    const formattedDate = new Date(date).toLocaleDateString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: '2-digit'
+    });
+    
     if (completedHabits.length > 0) {
       const habitNames = completedHabits.map(h => h.name).join(', ');
-      showToast(`Выполнено (${formatDate(date)}): ${habitNames}`, 3000);
+      showToast(`${formattedDate} Выполнено: ${habitNames}`, 3000);
     } else {
-      showToast('В этот день не выполнено ни одной привычки');
+      showToast(`${formattedDate}: Вы не выполнили ни одной привычки :(`);
     }
     return;
   }
@@ -394,7 +401,7 @@ function handleDayClick(dateStr, cell, date) {
   const habit = findHabit(state.selectedHabitId);
   if (!habit) return;
 
-  // Переключаем отметку
+  
   if (habit.checks[dateStr]) {
     delete habit.checks[dateStr];
     cell.classList.remove('marked');
@@ -413,38 +420,34 @@ function handleDayClick(dateStr, cell, date) {
   renderSelectedHabitInfo();
 }
 
-// --- Рендер информации о выбранной привычке ---
+
 function renderSelectedHabitInfo() {
   if (state.showAllHabits) {
-    // Режим всех привычек
-    const totalChecks = state.habits.reduce((sum, habit) => 
-      sum + Object.keys(habit.checks).length, 0
-    );
-    
+
     const stats = getStats(null, state.statsPeriod);
-    const periodTotal = state.statsPeriod === 'week' ? 7 : new Date(state.viewYear, state.viewMonth + 1, 0).getDate();
     
     selectedHabitInfo.innerHTML = `
-      <div class="habit-icon" style="background:var(--accent)">👁️</div>
+      <div class="all-habits-sticker">
+        <img src="images/star.svg" alt="Все привычки" class="sticker-image">
+      </div>
       <div>
-        <div style="font-weight:600">Все привычки</div>
+        <div style="font-weight:700; color:var(--accent)">Все привычки</div>
         <div style="font-size:12px;color:var(--muted)">
-          ${stats.completed}/${periodTotal} дней (${stats.percent}%)
+          Средний прогресс: ${stats.percent}%
         </div>
       </div>
     `;
     
     viewModeText.textContent = 'Все привычки';
     updateProgress(stats.percent, '#00BCD4');
-    updateStatsDisplay(stats, periodTotal);
+    updateStatsDisplay(stats);
     
   } else if (state.selectedHabitId) {
-    // Режим одной привычки
+    
     const habit = findHabit(state.selectedHabitId);
     if (!habit) return;
 
     const stats = getStats(habit, state.statsPeriod);
-    const periodTotal = state.statsPeriod === 'week' ? 7 : new Date(state.viewYear, state.viewMonth + 1, 0).getDate();
     
     selectedHabitInfo.innerHTML = `
       <div class="habit-icon" style="background:${habit.color}">
@@ -453,17 +456,17 @@ function renderSelectedHabitInfo() {
       <div>
         <div style="font-weight:600">${habit.name}</div>
         <div style="font-size:12px;color:var(--muted)">
-          ${stats.completed}/${periodTotal} дней (${stats.percent}%)
+          ${stats.completed}/${stats.total} дней (${stats.percent}%)
         </div>
       </div>
     `;
     
     viewModeText.textContent = habit.name;
     updateProgress(stats.percent, habit.color);
-    updateStatsDisplay(stats, periodTotal);
+    updateStatsDisplay(stats);
     
   } else {
-    // Ничего не выбрано
+    
     selectedHabitInfo.innerHTML = `<small>Выберите привычку или включите режим просмотра всех привычек</small>`;
     viewModeText.textContent = '—';
     updateProgress(0, '#00BCD4');
@@ -471,7 +474,7 @@ function renderSelectedHabitInfo() {
   }
 }
 
-// --- Обработчики для табов ---
+
 function setupTabButtons() {
   const tabButtons = document.querySelectorAll('.tab-btn');
   
@@ -479,11 +482,11 @@ function setupTabButtons() {
     btn.addEventListener('click', () => {
       const period = btn.dataset.period;
       
-      // Обновляем активное состояние
+      
       tabButtons.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       
-      // Обновляем период статистики
+      
       state.statsPeriod = period;
       saveState();
       renderAll();
@@ -491,7 +494,7 @@ function setupTabButtons() {
   });
 }
 
-// --- Обновление активного таба ---
+
 function updateStatsPeriodText() {
   const tabButtons = document.querySelectorAll('.tab-btn');
   tabButtons.forEach(btn => {
@@ -503,14 +506,20 @@ function updateStatsPeriodText() {
   });
 }
 
-// --- Обновление отображения статистики ---
-function updateStatsDisplay(stats, periodTotal = null) {
-  const totalDisplay = periodTotal || stats.total;
+
+function updateStatsDisplay(stats) {
   weekPercentEl.textContent = `${stats.percent}%`;
-  totalChecksEl.textContent = `${stats.completed}/${totalDisplay}`;
+  
+  if (state.showAllHabits) {
+    
+    totalChecksEl.textContent = `${stats.completed}/${stats.total}`;
+  } else {
+    
+    totalChecksEl.textContent = `${stats.completed}/${stats.total}`;
+  }
 }
 
-// --- Обновление прогресс-круга ---
+
 function updateProgress(percent, color) {
   const p = Math.max(0, Math.min(100, percent));
   const dash = `${p},100`;
@@ -520,7 +529,7 @@ function updateProgress(percent, color) {
   progressText.textContent = p + '%';
 }
 
-// --- Переключение режимов просмотра ---
+
 function toggleAllHabitsView() {
   state.showAllHabits = !state.showAllHabits;
   if (state.showAllHabits) {
@@ -534,14 +543,14 @@ function toggleAllHabitsView() {
   renderAll();
 }
 
-// --- Рендер всего приложения ---
+
 function renderAll() {
   renderHabits();
   renderCalendar();
   renderSelectedHabitInfo();
 }
 
-// --- Инициализация выбора иконок ---
+
 function renderIconChoices() {
   iconChoicesEl.innerHTML = '';
   Object.entries(ICONS).forEach(([key, svg]) => {
@@ -557,14 +566,26 @@ function renderIconChoices() {
     iconChoicesEl.appendChild(btn);
   });
   
-  // Выбираем первую иконку по умолчанию
+  
   const firstIcon = iconChoicesEl.querySelector('.icon-choice');
   if (firstIcon) firstIcon.classList.add('selected');
 }
 
-// --- Toast уведомления ---
+
 let toastTimer = null;
 function showToast(text, duration = 2000) {
+  
+  if (!toastEl.classList.contains('hidden')) {
+    toastEl.classList.add('hidden');
+    setTimeout(() => {
+      showNewToast(text, duration);
+    }, 300);
+  } else {
+    showNewToast(text, duration);
+  }
+}
+
+function showNewToast(text, duration) {
   toastEl.textContent = text;
   toastEl.classList.remove('hidden');
   
@@ -574,7 +595,7 @@ function showToast(text, duration = 2000) {
   }, duration);
 }
 
-// --- Управление темой ---
+
 function applyTheme(theme) {
   document.body.className = theme;
   localStorage.setItem('ht_theme', theme);
@@ -585,7 +606,7 @@ function loadTheme() {
   applyTheme(saved);
 }
 
-// --- Навигация по месяцам ---
+
 function navigateMonth(direction) {
   state.viewMonth += direction;
   if (state.viewMonth < 0) {
@@ -595,34 +616,70 @@ function navigateMonth(direction) {
     state.viewMonth = 0;
     state.viewYear++;
   }
-  renderAll(); // Полностью перерендериваем, чтобы обновилась статистика
+  renderAll(); 
 }
 
-// --- Экспорт в PNG ---
+
 function exportToPNG() {
-  const mainArea = document.querySelector('.main-area');
+  showToast('Создаем изображение...', 1500);
   
-  html2canvas(mainArea, {
-    backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg'),
-    scale: 2,
-    useCORS: true
-  }).then(canvas => {
-    const link = document.createElement('a');
-    link.download = `habits-${formatDate(new Date())}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-  }).catch(e => {
-    console.error('Export error:', e);
-    showToast('Ошибка экспорта');
-  });
+  setTimeout(() => {
+    const calendarGrid = document.querySelector('.calendar-grid');
+    const calendarHeader = document.querySelector('.calendar-header');
+    
+    
+    const exportContainer = document.createElement('div');
+    exportContainer.style.cssText = `
+      position: fixed;
+      left: -10000px;
+      top: -10000px;
+      width: ${calendarGrid.offsetWidth}px;
+      background: ${getComputedStyle(document.body).backgroundColor};
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    `;
+    
+    
+    const headerClone = calendarHeader.cloneNode(true);
+    const gridClone = calendarGrid.cloneNode(true);
+    
+    
+    const buttons = headerClone.querySelectorAll('button');
+    buttons.forEach(btn => btn.remove());
+    
+    exportContainer.appendChild(headerClone);
+    exportContainer.appendChild(gridClone);
+    document.body.appendChild(exportContainer);
+    
+    html2canvas(exportContainer, {
+      backgroundColor: getComputedStyle(document.body).backgroundColor,
+      scale: 2,
+      useCORS: true,
+      logging: false
+    }).then(canvas => {
+      const link = document.createElement('a');
+      link.download = `calendar-${formatDate(new Date())}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      
+      document.body.removeChild(exportContainer);
+      showToast('Календарь экспортирован!');
+    }).catch(error => {
+      document.body.removeChild(exportContainer);
+      console.error('Export error:', error);
+      showToast('Ошибка экспорта');
+    });
+  }, 100);
 }
 
-// --- Обработчики событий ---
+
 function setupEventListeners() {
-  // Модальное окно привычек
+  
   addHabitBtn.addEventListener('click', () => {
     habitTitleInput.value = '';
-    habitColorInput.value = '#4caf50';
+    habitColorInput.value = '#8078D8';
     document.querySelectorAll('.icon-choice').forEach(n => n.classList.remove('selected'));
     const firstIcon = iconChoicesEl.querySelector('.icon-choice');
     if (firstIcon) firstIcon.classList.add('selected');
@@ -654,17 +711,17 @@ function setupEventListeners() {
     showToast('Привычка добавлена!');
   });
 
-  // Навигация
+  
   prevMonthBtn.addEventListener('click', () => navigateMonth(-1));
   nextMonthBtn.addEventListener('click', () => navigateMonth(1));
 
-  // Переключение режимов
+  
   toggleViewMode.addEventListener('click', toggleAllHabitsView);
 
-  // Табы переключения периода
+  
   setupTabButtons();
 
-  // Удаление привычки
+  
   deleteHabitBtn.addEventListener('click', () => {
     if (!state.selectedHabitId && !state.showAllHabits) {
       showToast('Выберите привычку для удаления');
@@ -690,23 +747,23 @@ function setupEventListeners() {
     showToast('Привычка удалена');
   });
 
-  // Тема
+  
   themeToggle.addEventListener('click', () => {
     const next = document.body.classList.contains('dark') ? 'light' : 'dark';
     applyTheme(next);
   });
 
-  // Экспорт
+  
   exportBtn.addEventListener('click', exportToPNG);
 
-  // Закрытие модального окна по клику вне его
+  
   addHabitModal.addEventListener('click', (e) => {
     if (e.target === addHabitModal) {
       addHabitModal.classList.add('hidden');
     }
   });
 
-  // Закрытие по ESC
+  
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !addHabitModal.classList.contains('hidden')) {
       addHabitModal.classList.add('hidden');
@@ -714,7 +771,7 @@ function setupEventListeners() {
   });
 }
 
-// --- Инициализация приложения ---
+
 function initApp() {
   loadTheme();
   loadState();
@@ -723,7 +780,7 @@ function initApp() {
   updateStatsPeriodText();
   renderAll();
   
-  // Инициализируем текст кнопки переключения режима
+  
   toggleViewMode.textContent = state.showAllHabits ? 
     'Показать одну привычку' : 'Показать все привычки';
   
@@ -732,5 +789,5 @@ function initApp() {
   }
 }
 
-// Запускаем приложение
+
 document.addEventListener('DOMContentLoaded', initApp);

@@ -18,21 +18,19 @@
       </div>
     </header>
 
-    <!-- Left: habits list -->
     <aside class="sidebar">
       <div class="sidebar-head">
         <h3>Привычки</h3>
         <button id="addHabitBtn" class="btn">+ Добавить</button>
       </div>
       <ul id="habitsList" class="habits-list">
-        <!-- habits inserted here -->
+
       </ul>
       <div class="legend">
         <small>Подсказка: выберите привычку, чтобы видеть её календарь и статистику.</small>
       </div>
     </aside>
 
-    <!-- Main: calendar -->
     <main class="main-area">
       <div class="calendar-header">
         <div class="month-nav">
@@ -41,7 +39,7 @@
           <button id="nextMonth" class="icon-btn">▶</button>
         </div>
         <div class="selected-habit-info" id="selectedHabitInfo">
-          <!-- habit name + icon -->
+
         </div>
         <div class="view-toggle">
           <button id="toggleViewMode" class="btn ghost">Показать все привычки</button>
@@ -49,16 +47,14 @@
       </div>
 
       <div id="calendar" class="calendar-grid">
-        <!-- calendar days -->
+
       </div>
     </main>
 
-    <!-- Right: stats -->
     <aside class="rightbar">
       <div id="statsCard" class="card stats-card">
         <h4>Статистика</h4>
         
-        <!-- Новые табы для переключения периода -->
         <div class="stats-period-toggle">
           <div class="tab-buttons">
             <button class="tab-btn active" data-period="week">Неделя</button>
@@ -82,9 +78,9 @@
         </div>
 
         <div class="stats-list">
-          <div>Процент выполнения: <strong id="weekPercent">0%</strong></div>
-          <div>Выполнено дней: <strong id="totalChecks">0/0</strong></div>
-          <div>Режим просмотра: <strong id="viewModeText">—</strong></div>
+          <div><span class="stats-title">Прогресс:</span> <strong id="weekPercent">0%</strong></div>
+          <div><span class="stats-title">Выполнено:</span> <strong id="totalChecks">0/0</strong></div>
+          <div>Режим: <strong id="viewModeText">—</strong></div>
         </div>
 
         <div class="card-actions">
@@ -104,7 +100,6 @@
     </aside>
   </div>
 
-  <!-- Modal: Add Habit -->
   <div id="addHabitModal" class="modal hidden">
     <div class="modal-content">
       <h3>Новая привычка</h3>
@@ -112,12 +107,11 @@
         <input id="habitTitle" type="text" placeholder="Например: пить воду"/>
       </label>
       <label>Цвет
-        <input id="habitColor" type="color" value="#4caf50"/>
+        <input id="habitColor" type="color" value="#8078D8"/>
       </label>
-      <div>
-        <div>Иконка</div>
+      <div class="icon-section">
+        <div class="section-label">Иконка</div>
         <div id="iconChoices" class="icon-choices">
-          <!-- icon options inserted here -->
         </div>
       </div>
       <div class="modal-actions">
@@ -127,7 +121,6 @@
     </div>
   </div>
 
-  <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
   <script src="app.js"></script>
