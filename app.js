@@ -1,12 +1,15 @@
 const LS_KEY = 'ht_habits_v2';
 const ICONS = {
-  water: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C12 2 6 8 6 12a6 6 0 1 0 12 0c0-4-6-10-6-10z" fill="currentColor"/></svg>`,
-  book: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 6a2 2 0 0 1 2-2h13v14a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6z" fill="currentColor"/></svg>`,
-  dumbbell: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 8h-2v8h2V8zM6 8H4v8h2V8zM8 10h8v4H8v-4z" fill="currentColor"/></svg>`,
-  star: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 2l2.6 6.9L21 10l-5 3.6L17.2 21 12 17.7 6.8 21 8 13.6 3 10l6.4-1.1L12 2z" fill="currentColor"/></svg>`,
-  heart: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/></svg>`,
-  check: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor"/></svg>`
+  icon1: `<img src="images/icon1.svg" class="icon">`,
+  icon2: `<img src="images/icon2.svg" class="icon">`,
+  icon3: `<img src="images/icon3.svg" class="icon">`,
+  icon4: `<img src="images/icon4.svg" class="icon">`,
+  icon5: `<img src="images/icon5.svg" class="icon">`,
+  icon6: `<img src="images/icon6.svg" class="icon">`,
+  icon7: `<img src="images/icon7.svg" class="icon">`,
+  icon8: `<img src="images/icon8.svg" class="icon">`
 };
+
 
 
 let state = {
@@ -236,8 +239,9 @@ function renderHabits() {
     
     li.innerHTML = `
       <div class="habit-icon" style="background:${habit.color}">
-        ${ICONS[habit.icon] || ICONS.star}
+        ${ICONS[habit.icon].replace('class="icon"', 'class="icon icon-white"') || ICONS.star}
       </div>
+
       <div class="habit-content">
         <div class="habit-title">${habit.name}</div>
         <div class="habit-meta">
@@ -273,10 +277,16 @@ function renderCalendar() {
   const month = state.viewMonth;
   
   
-  currentMonthEl.textContent = new Date(year, month).toLocaleString('ru-RU', {
-    month: 'long',
-    year: 'numeric'
-  });
+  function capitalizeFirst(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  currentMonthEl.textContent = capitalizeFirst(
+    new Date(year, month).toLocaleString('ru-RU', {
+      month: 'long',
+      year: 'numeric'
+    })
+  );
 
   const firstOfMonth = new Date(year, month, 1);
   const startDay = (firstOfMonth.getDay() + 6) % 7; 
@@ -451,7 +461,7 @@ function renderSelectedHabitInfo() {
     
     selectedHabitInfo.innerHTML = `
       <div class="habit-icon" style="background:${habit.color}">
-        ${ICONS[habit.icon] || ICONS.star}
+        ${ICONS[habit.icon].replace('class="icon"', 'class="icon icon-white"') || ICONS.star}
       </div>
       <div>
         <div style="font-weight:600">${habit.name}</div>
