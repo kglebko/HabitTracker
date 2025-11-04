@@ -10,8 +10,6 @@ const ICONS = {
   icon8: `<img src="images/icon8.svg" class="icon">`
 };
 
-
-
 let state = {
   habits: [],
   selectedHabitId: null,
@@ -45,7 +43,6 @@ const themeToggle = document.getElementById('themeToggle');
 const exportBtn = document.getElementById('exportBtn');
 const toggleViewMode = document.getElementById('toggleViewMode');
 
-
 function formatDate(d) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, '0');
@@ -63,6 +60,11 @@ function isToday(date) {
 
 function isFutureDate(date) {
   return date > new Date();
+}
+
+function isCurrentMonth() {
+  const now = new Date();
+  return state.viewYear === now.getFullYear() && state.viewMonth === now.getMonth();
 }
 
 function getWeekRange(date = new Date()) {
@@ -105,9 +107,16 @@ function getDatesForPeriod(period, date = new Date()) {
   return dates;
 }
 
-function getStats(habit = null, period = 'week') {
-  const today = new Date();
-  const dates = getDatesForPeriod(period, today);
+function getStats(habit = null) {
+  let period = state.statsPeriod;
+  
+  if (!isCurrentMonth()) {
+    period = 'month';
+  }
+  
+
+  const dateForStats = period === 'week' ? new Date() : new Date(state.viewYear, state.viewMonth, 1);
+  const dates = getDatesForPeriod(period, dateForStats);
   
   if (habit) {
     const completed = dates.filter(date => {
@@ -160,12 +169,11 @@ function getHabitStats(habit) {
   const totalChecks = Object.keys(habit.checks).length;
   
   return { 
-    total: totalChecks, 
+    total: totalChecks,
     week: weekStats,
     month: monthStats
   };
 }
-
 
 function loadState() {
   try {
@@ -212,7 +220,6 @@ function findHabit(id) {
   return state.habits.find(h => h.id === id); 
 }
 
-
 function renderHabits() {
   habitsListEl.innerHTML = '';
   
@@ -230,7 +237,15 @@ function renderHabits() {
 
   state.habits.forEach(habit => {
     const stats = getHabitStats(habit);
-    const currentStats = state.statsPeriod === 'week' ? stats.week : stats.month;
+    
+    const currentStats = isCurrentMonth() ? 
+      (state.statsPeriod === 'week' ? stats.week : stats.month) : 
+      stats.month;
+    
+    const periodText = isCurrentMonth() ? 
+      (state.statsPeriod === 'week' ? 'неделю' : 'месяц') : 
+      'месяц';
+    
     const isSelected = state.selectedHabitId === habit.id && !state.showAllHabits;
     
     const li = document.createElement('li');
@@ -245,7 +260,7 @@ function renderHabits() {
       <div class="habit-content">
         <div class="habit-title">${habit.name}</div>
         <div class="habit-meta">
-          <small>${stats.total} отметок • ${currentStats.percent}% за ${state.statsPeriod === 'week' ? 'неделю' : 'месяц'}</small>
+          <small>${stats.total} отметок • ${currentStats.percent}% за ${periodText}</small>
         </div>
       </div>
     `;
@@ -261,7 +276,6 @@ function renderHabits() {
   });
 }
 
-
 function renderCalendar() {
   calendarEl.innerHTML = '';
   
@@ -275,7 +289,6 @@ function renderCalendar() {
 
   const year = state.viewYear;
   const month = state.viewMonth;
-  
   
   function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -292,7 +305,6 @@ function renderCalendar() {
   const startDay = (firstOfMonth.getDay() + 6) % 7; 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  
   for (let i = 0; i < 42; i++) { 
     const cell = document.createElement('div');
     cell.className = 'day';
@@ -313,23 +325,18 @@ function renderCalendar() {
       cell.classList.add('today');
     }
 
-    
     if (isFutureDate(currentDate)) {
       cell.classList.add('future');
     }
 
-    
     const dayNumber = document.createElement('div');
     dayNumber.className = 'day-num';
     dayNumber.textContent = dayNum;
     cell.appendChild(dayNumber);
 
-    
     if (state.showAllHabits && state.habits.length > 0) {
-      
       const dotsContainer = document.createElement('div');
       dotsContainer.className = 'dots';
-      
       
       const habitsToShow = state.habits.slice(0, 6);
       
@@ -347,7 +354,6 @@ function renderCalendar() {
         cell.classList.add('multi-marked');
         cell.appendChild(dotsContainer);
         
-        
         if (state.habits.length > 6) {
           const extraCount = state.habits.slice(6).filter(h => h.checks[dateStr]).length;
           if (extraCount > 0) {
@@ -361,7 +367,6 @@ function renderCalendar() {
       }
       
     } else if (state.selectedHabitId) {
-      
       const habit = findHabit(state.selectedHabitId);
       if (habit && habit.checks[dateStr]) {
         const dot = document.createElement('div');
@@ -377,16 +382,13 @@ function renderCalendar() {
   }
 }
 
-
 function handleDayClick(dateStr, cell, date) {
-  
   if (isFutureDate(date)) {
     showToast('Этот день еще не наступил :(', 2000);
     return;
   }
 
   if (state.showAllHabits) {
-    
     const completedHabits = state.habits.filter(habit => habit.checks[dateStr]);
     const formattedDate = new Date(date).toLocaleDateString('ru-RU', {
       day: '2-digit',
@@ -411,7 +413,6 @@ function handleDayClick(dateStr, cell, date) {
   const habit = findHabit(state.selectedHabitId);
   if (!habit) return;
 
-  
   if (habit.checks[dateStr]) {
     delete habit.checks[dateStr];
     cell.classList.remove('marked');
@@ -428,13 +429,12 @@ function handleDayClick(dateStr, cell, date) {
 
   saveState();
   renderSelectedHabitInfo();
+  renderHabits();
 }
-
 
 function renderSelectedHabitInfo() {
   if (state.showAllHabits) {
-
-    const stats = getStats(null, state.statsPeriod);
+    const stats = getStats(null);
     
     selectedHabitInfo.innerHTML = `
       <div class="all-habits-sticker">
@@ -453,11 +453,10 @@ function renderSelectedHabitInfo() {
     updateStatsDisplay(stats);
     
   } else if (state.selectedHabitId) {
-    
     const habit = findHabit(state.selectedHabitId);
     if (!habit) return;
 
-    const stats = getStats(habit, state.statsPeriod);
+    const stats = getStats(habit);
     
     selectedHabitInfo.innerHTML = `
       <div class="habit-icon" style="background:${habit.color}">
@@ -476,7 +475,6 @@ function renderSelectedHabitInfo() {
     updateStatsDisplay(stats);
     
   } else {
-    
     selectedHabitInfo.innerHTML = `<small>Выберите привычку или включите режим просмотра всех привычек</small>`;
     viewModeText.textContent = '—';
     updateProgress(0, '#00BCD4');
@@ -484,26 +482,30 @@ function renderSelectedHabitInfo() {
   }
 }
 
-
 function setupTabButtons() {
   const tabButtons = document.querySelectorAll('.tab-btn');
-  
-  tabButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const period = btn.dataset.period;
-      
-      
-      tabButtons.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      
-      state.statsPeriod = period;
-      saveState();
-      renderAll();
-    });
-  });
-}
 
+  const statsPeriodToggle = document.querySelector('.stats-period-toggle');
+  if (isCurrentMonth()) {
+    statsPeriodToggle.style.display = 'block';
+    
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const period = btn.dataset.period;
+        
+        tabButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        state.statsPeriod = period;
+        saveState();
+        renderAll();
+      });
+    });
+  } else {
+    statsPeriodToggle.style.display = 'none';
+    state.statsPeriod = 'month';
+  }
+}
 
 function updateStatsPeriodText() {
   const tabButtons = document.querySelectorAll('.tab-btn');
@@ -516,19 +518,15 @@ function updateStatsPeriodText() {
   });
 }
 
-
 function updateStatsDisplay(stats) {
   weekPercentEl.textContent = `${stats.percent}%`;
   
   if (state.showAllHabits) {
-    
     totalChecksEl.textContent = `${stats.completed}/${stats.total}`;
   } else {
-    
     totalChecksEl.textContent = `${stats.completed}/${stats.total}`;
   }
 }
-
 
 function updateProgress(percent, color) {
   const p = Math.max(0, Math.min(100, percent));
@@ -538,7 +536,6 @@ function updateProgress(percent, color) {
   progressCircle.style.stroke = color || 'var(--primary)';
   progressText.textContent = p + '%';
 }
-
 
 function toggleAllHabitsView() {
   state.showAllHabits = !state.showAllHabits;
@@ -553,13 +550,12 @@ function toggleAllHabitsView() {
   renderAll();
 }
 
-
 function renderAll() {
   renderHabits();
   renderCalendar();
   renderSelectedHabitInfo();
+  setupTabButtons(); 
 }
-
 
 function renderIconChoices() {
   iconChoicesEl.innerHTML = '';
@@ -576,15 +572,12 @@ function renderIconChoices() {
     iconChoicesEl.appendChild(btn);
   });
   
-  
   const firstIcon = iconChoicesEl.querySelector('.icon-choice');
   if (firstIcon) firstIcon.classList.add('selected');
 }
 
-
 let toastTimer = null;
 function showToast(text, duration = 2000) {
-  
   if (!toastEl.classList.contains('hidden')) {
     toastEl.classList.add('hidden');
     setTimeout(() => {
@@ -605,7 +598,6 @@ function showNewToast(text, duration) {
   }, duration);
 }
 
-
 function applyTheme(theme) {
   document.body.className = theme;
   localStorage.setItem('ht_theme', theme);
@@ -616,7 +608,6 @@ function loadTheme() {
   applyTheme(saved);
 }
 
-
 function navigateMonth(direction) {
   state.viewMonth += direction;
   if (state.viewMonth < 0) {
@@ -626,9 +617,8 @@ function navigateMonth(direction) {
     state.viewMonth = 0;
     state.viewYear++;
   }
-  renderAll(); 
+  renderAll();
 }
-
 
 function exportToPNG() {
   showToast('Создаем изображение...', 1500);
@@ -636,7 +626,6 @@ function exportToPNG() {
   setTimeout(() => {
     const calendarGrid = document.querySelector('.calendar-grid');
     const calendarHeader = document.querySelector('.calendar-header');
-    
     
     const exportContainer = document.createElement('div');
     exportContainer.style.cssText = `
@@ -650,10 +639,8 @@ function exportToPNG() {
       box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     `;
     
-    
     const headerClone = calendarHeader.cloneNode(true);
     const gridClone = calendarGrid.cloneNode(true);
-    
     
     const buttons = headerClone.querySelectorAll('button');
     buttons.forEach(btn => btn.remove());
@@ -673,7 +660,6 @@ function exportToPNG() {
       link.href = canvas.toDataURL('image/png');
       link.click();
       
-      
       document.body.removeChild(exportContainer);
       showToast('Календарь экспортирован!');
     }).catch(error => {
@@ -684,9 +670,7 @@ function exportToPNG() {
   }, 100);
 }
 
-
 function setupEventListeners() {
-  
   addHabitBtn.addEventListener('click', () => {
     habitTitleInput.value = '';
     habitColorInput.value = '#8078D8';
@@ -720,17 +704,13 @@ function setupEventListeners() {
     renderAll();
     showToast('Привычка добавлена!');
   });
-
   
   prevMonthBtn.addEventListener('click', () => navigateMonth(-1));
   nextMonthBtn.addEventListener('click', () => navigateMonth(1));
-
   
   toggleViewMode.addEventListener('click', toggleAllHabitsView);
-
   
   setupTabButtons();
-
   
   deleteHabitBtn.addEventListener('click', () => {
     if (!state.selectedHabitId && !state.showAllHabits) {
@@ -756,23 +736,19 @@ function setupEventListeners() {
     renderAll();
     showToast('Привычка удалена');
   });
-
   
   themeToggle.addEventListener('click', () => {
     const next = document.body.classList.contains('dark') ? 'light' : 'dark';
     applyTheme(next);
   });
-
   
   exportBtn.addEventListener('click', exportToPNG);
-
   
   addHabitModal.addEventListener('click', (e) => {
     if (e.target === addHabitModal) {
       addHabitModal.classList.add('hidden');
     }
   });
-
   
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !addHabitModal.classList.contains('hidden')) {
@@ -780,7 +756,6 @@ function setupEventListeners() {
     }
   });
 }
-
 
 function initApp() {
   loadTheme();
@@ -790,7 +765,6 @@ function initApp() {
   updateStatsPeriodText();
   renderAll();
   
-  
   toggleViewMode.textContent = state.showAllHabits ? 
     'Показать одну привычку' : 'Показать все привычки';
   
@@ -798,6 +772,5 @@ function initApp() {
     toggleViewMode.classList.add('active');
   }
 }
-
 
 document.addEventListener('DOMContentLoaded', initApp);
